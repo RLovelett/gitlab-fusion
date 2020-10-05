@@ -2,15 +2,6 @@
   "object": {
     "pins": [
       {
-        "package": "Socket",
-        "repositoryURL": "https://github.com/IBM-Swift/BlueSocket",
-        "state": {
-          "branch": null,
-          "revision": "c46a3d41f5b2401d18bcb46d0101cdc5cd13e307",
-          "version": "1.0.52"
-        }
-      },
-      {
         "package": "Environment",
         "repositoryURL": "https://github.com/wlisac/environment.git",
         "state": {
@@ -26,15 +17,6 @@
           "branch": null,
           "revision": "142d4bc1118602f3679c777d2e0da89c227cd918",
           "version": "1.2.0"
-        }
-      },
-      {
-        "package": "Shout",
-        "repositoryURL": "https://github.com/jakeheis/Shout",
-        "state": {
-          "branch": null,
-          "revision": "65bf1d1d42e2fb0c47e4d78c0653ebb6d5de5cb5",
-          "version": "0.5.6"
         }
       },
       {

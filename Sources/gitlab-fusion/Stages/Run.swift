@@ -10,7 +10,7 @@ import Environment
 import Foundation
 import os.log
 import Path
-import Shout
+import SecureShell
 
 private let log = OSLog(subsystem: subsystem, category: "run")
 
@@ -84,11 +84,10 @@ struct Run: ParsableCommand {
         let script = try String(contentsOf: scriptFile)
         os_log("Running script:\n%{public}@", log: log, type: .info, script)
 
-        let ssh = try SSH(host: ip)
-        try ssh.authenticate(username: sshUsername, password: sshPassword)
-        let exitCode = try ssh.execute(script) { output in
-            print(output)
-        }
+        let session = try Session(host: ip, username: sshUsername)
+        try session.authenticate(withPassword: sshPassword)
+        let channel = try session.openChannel()
+        let exitCode = channel.execute(script, stdout: FileHandle.standardOutput, stderr: FileHandle.standardError)
 
         if exitCode == 0 {
             os_log("Run stage %{public}@ returned %{public}d.", log: log, type: .info, subStage, exitCode)

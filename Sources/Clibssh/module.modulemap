@@ -1,0 +1,11 @@
+//
+//  module.modulemap
+//  Clibssh
+//
+//  Created by Ryan Lovelett on 10/5/20.
+//
+
+module Clibssh {
+    header "shim.h"
+    export *
+}

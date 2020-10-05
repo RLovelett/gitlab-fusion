@@ -10,7 +10,7 @@ import Environment
 import Foundation
 import os.log
 import Path
-import Shout
+import SecureShell
 
 private let log = OSLog(subsystem: subsystem, category: "prepare")
 
@@ -135,16 +135,12 @@ struct Prepare: ParsableCommand {
         }
 
         // Wait for ssh to become available
-        for i in 1...60 {
-            guard i != 60 else {
-                // 'Waited 60 seconds for sshd to start, exiting...'
-                throw GitlabRunnerError.systemFailure
-            }
-
-            // TODO: Encapsulate this for timeout purposes
-            let ssh = try SSH(host: ip)
-            try ssh.authenticate(username: sshUsername, password: sshPassword)
-            let exitCode = try ssh.execute("echo -n 2>&1")
+        for _ in 1...60 {
+            // TODO: Retry if connection times out
+            let session = try Session(host: ip, username: sshUsername)
+            try session.authenticate(withPassword: sshPassword)
+            let channel = try session.openChannel()
+            let exitCode = channel.execute("echo -n 2>&1")
 
             if exitCode == 0 {
                 return
@@ -152,5 +148,9 @@ struct Prepare: ParsableCommand {
 
             sleep(60)
         }
+
+        // TODO: Actually handle this case better
+        // 'Waited 60 seconds for sshd to start, exiting...'
+        throw GitlabRunnerError.systemFailure
     }
 }
