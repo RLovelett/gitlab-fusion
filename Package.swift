@@ -27,7 +27,20 @@ let package = Package(
         ),
         .target(
             name: "SecureShell",
-            dependencies: ["Clibssh"]
+            dependencies: [
+                .target(name: "Clibssh"),
+                .product(name: "Path", package: "Path.swift"),
+            ]
+        ),
+        .testTarget(
+            name: "SecureShellTests",
+            dependencies: [
+                .target(name: "SecureShell"),
+                .product(name: "Path", package: "Path.swift"),
+            ],
+            resources: [
+                .process("Fixtures"),
+            ]
         ),
         .target(
             name: "VMwareFusion",

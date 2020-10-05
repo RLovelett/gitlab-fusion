@@ -6,6 +6,7 @@
 //
 
 import Clibssh
+import Path
 
 /// A `Session` encapsulates the entire lifetime of the connection with a remote
 /// machine. A `Session` is responsible for connecting and authenticating the
@@ -52,17 +53,17 @@ public final class Session {
         ssh_free(session)
     }
 
-    /// Attempt to authenticate the session using password.
+    /// Path to a file from which the identity (private key) for public key
+    /// authentication is read.
     ///
-    /// - Parameter password: The password to attempt authentication with.
+    /// - Parameter path: Path to identity private key.
     /// - Throws: `SecureShellError` if authentication fails.
-    public func authenticate(withPassword password: String) throws {
-        let returnCode = password.withCString {
-            ssh_auth_e(rawValue: ssh_userauth_password(session, nil, $0))
-        }
+    public func authenticate(withIdentity path: Path) throws {
+        let key = try PrivateKey(contentsOfFile: path)
+        let returnCode = ssh_auth_e(rawValue: ssh_userauth_publickey(session, nil, key.key))
 
         guard returnCode == SSH_AUTH_SUCCESS else {
-            throw SecureShellError(session, description: "Could not authenticate.")
+            throw SecureShellError(session, description: "Could not authenticate with identity \(path).")
         }
     }
 

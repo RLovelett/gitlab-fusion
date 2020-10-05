@@ -40,11 +40,8 @@ struct Run: ParsableCommand {
 
     // MARK: - Secure Shell (SSH) specific arguments
 
-    @Option(help: "User used to authenticate as over SSH to the VMware Fusion guest.")
-    var sshUsername = "buildbot"
-
-    @Option(help: "Password used to authenticate as over SSH to the VMware Fusion guest.")
-    var sshPassword = "Time2Build"
+    @OptionGroup()
+    var sshOptions: SecureShellOptions
 
     // MARK: - Virtual Machine runtime specific arguments
 
@@ -85,8 +82,8 @@ struct Run: ParsableCommand {
         let script = try String(contentsOf: scriptFile)
         os_log("Running script:\n%{public}@", log: log, type: .info, script)
 
-        let session = try Session(host: ip, username: sshUsername)
-        try session.authenticate(withPassword: sshPassword)
+        let session = try Session(host: ip, username: sshOptions.sshUsername)
+        try session.authenticate(withIdentity: sshOptions.sshIdentityFile)
         let channel = try session.openChannel()
         let exitCode = channel.execute(script, stdout: FileHandle.standardOutput, stderr: FileHandle.standardError)
 

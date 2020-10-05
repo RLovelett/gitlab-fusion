@@ -59,11 +59,8 @@ struct Prepare: ParsableCommand {
 
     // MARK: - Secure Shell (SSH) specific arguments
 
-    @Option(help: "User used to authenticate as over SSH to the VMware Fusion guest.")
-    var sshUsername = "buildbot"
-
-    @Option(help: "Password used to authenticate as over SSH to the VMware Fusion guest.")
-    var sshPassword = "Time2Build"
+    @OptionGroup()
+    var sshOptions: SecureShellOptions
 
     // MARK: - Validating the command-line input
 
@@ -133,8 +130,8 @@ struct Prepare: ParsableCommand {
         // Wait for ssh to become available
         for _ in 1...60 {
             // TODO: Retry if connection times out
-            let session = try Session(host: ip, username: sshUsername)
-            try session.authenticate(withPassword: sshPassword)
+            let session = try Session(host: ip, username: sshOptions.sshUsername)
+            try session.authenticate(withIdentity: sshOptions.sshIdentityFile)
             let channel = try session.openChannel()
             let exitCode = channel.execute("echo -n 2>&1")
 

@@ -45,4 +45,12 @@ struct SecureShellError: LocalizedError {
             libsshErrorText = "Was not able to infer the error from \(session)."
         }
     }
+
+    var errorDescription: String? {
+        if libsshErrorText.isEmpty {
+            return description
+        }
+
+        return "\(description) - \(libsshErrorText)"
+    }
 }

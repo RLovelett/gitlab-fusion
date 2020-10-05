@@ -160,7 +160,7 @@ and `cleanup_args` should be located in the respective help of each subcommand.
     prepare_args = [
       "prepare",
       "--ssh-username", "buildbot",
-      "--ssh-key", "/Users/buildbot/Library/Application Support/me.lovelett.gitlab-fusion/id_ed25519",
+      "--ssh-identity-file", "/Users/buildbot/Library/Application Support/me.lovelett.gitlab-fusion/id_ed25519",
       "/Users/buildbot/base-macOS-10.15.7-19H2-xcode-12.0.0.vmwarevm/base-macOS-10.15.7-19H2-xcode-12.0.0.vmx"
     ]
 
@@ -168,7 +168,7 @@ and `cleanup_args` should be located in the respective help of each subcommand.
     run_args = [
       "run",
       "--ssh-username", "buildbot",
-      "--ssh-key", "/Users/buildbot/Library/Application Support/me.lovelett.gitlab-fusion/id_ed25519",
+      "--ssh-identity-file", "/Users/buildbot/Library/Application Support/me.lovelett.gitlab-fusion/id_ed25519",
       "/Users/buildbot/base-macOS-10.15.7-19H2-xcode-12.0.0.vmwarevm/base-macOS-10.15.7-19H2-xcode-12.0.0.vmx"
     ]
 
