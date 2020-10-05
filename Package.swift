@@ -30,12 +30,26 @@ let package = Package(
             dependencies: ["Clibssh"]
         ),
         .target(
+            name: "VMwareFusion",
+            dependencies: [
+                .product(name: "Path", package: "Path.swift"),
+            ]
+        ),
+        .testTarget(
+            name: "VMwareFusionTests",
+            dependencies: [
+                .target(name: "VMwareFusion"),
+                .product(name: "Path", package: "Path.swift"),
+            ]
+        ),
+        .target(
             name: "gitlab-fusion",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Environment", package: "Environment"),
                 .product(name: "Path", package: "Path.swift"),
                 .target(name: "SecureShell"),
+                .target(name: "VMwareFusion"),
             ]
         ),
     ]

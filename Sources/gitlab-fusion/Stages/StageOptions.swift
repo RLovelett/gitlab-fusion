@@ -8,20 +8,21 @@
 import ArgumentParser
 import Environment
 import Path
+import VMwareFusion
 
 /// Common arguments used by the individual stage subcommands.
 struct StageOptions: ParsableArguments {
-    @Option(help: "Fully qualified path to the VMware Fusion application.")
-    var vmwareFusion = Path.root.join("Applications").join("VMware Fusion.app")
+    @Option(name: .customLong("vmware-fusion"), help: "Fully qualified path to the VMware Fusion application.")
+    var vmwareFusionPath = Path.root.join("Applications").join("VMware Fusion.app")
+
+    /// A type to invoke `vmrun` and interact with virtual machines.
+    var vmwareFusion: VMwareFusion {
+        VMwareFusion(vmwareFusionPath)
+    }
 
     /// Fully qualified path to the VMware Fusion `Info.plist` file.
     var vmwareFusionInfo: Path {
-        vmwareFusion.join("Contents").join("Info.plist")
-    }
-
-    /// Fully qualified path to the VMware `vmrun` command.
-    var vmrunPath: Path {
-        vmwareFusion.join("Contents").join("Public").join("vmrun")
+        vmwareFusionPath.join("Contents").join("Info.plist")
     }
 
     @Option(help: "Fully qualified path to directory where cloned images are stored.")

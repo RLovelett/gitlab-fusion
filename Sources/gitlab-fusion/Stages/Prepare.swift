@@ -11,6 +11,7 @@ import Foundation
 import os.log
 import Path
 import SecureShell
+import VMwareFusion
 
 private let log = OSLog(subsystem: subsystem, category: "prepare")
 
@@ -67,11 +68,6 @@ struct Prepare: ParsableCommand {
     // MARK: - Validating the command-line input
 
     func validate() throws {
-        guard options.vmrunPath.isExecutable else {
-            os_log("%{public}@ is not executable.", log: log, type: .error, options.vmrunPath.string)
-            throw GitlabRunnerError.systemFailure
-        }
-
         guard options.vmImagesPath.exists, options.vmImagesPath.isWritable else {
             os_log("%{public}@ does not exist.", log: log, type: .error, options.vmImagesPath.string)
             throw GitlabRunnerError.systemFailure
@@ -84,7 +80,7 @@ struct Prepare: ParsableCommand {
         os_log("Prepare stage is starting.", log: log, type: .info)
 
         os_log("The base VMware Fusion guest is %{public}@", log: log, type: .debug, baseVMPath.string)
-        let base = VirtualMachine(image: baseVMPath, executable: options.vmrunPath)
+        let base = VirtualMachine(image: baseVMPath, executable: options.vmwareFusion)
 
         /// The name of VMware Fusion guest created by the clone operation
         let clonedGuestName = "\(base.name)-runner-\(ciRunnerId)-concurrent-\(ciConcurrentProjectId)"
@@ -109,7 +105,7 @@ struct Prepare: ParsableCommand {
                 .write(line: "Cloning from snapshot \"\(baseVMSnapshotName)\" in base guest \"\(base.name)\" to \"\(clonedGuestName)\"...")
             clone = try base.clone(to: clonedGuestPath, named: clonedGuestName, linkedTo: baseVMSnapshotName)
         } else {
-            clone = VirtualMachine(image: clonedGuestPath, executable: options.vmrunPath)
+            clone = VirtualMachine(image: clonedGuestPath, executable: options.vmwareFusion)
         }
 
         /// The name of the snapshot to create on linked clone

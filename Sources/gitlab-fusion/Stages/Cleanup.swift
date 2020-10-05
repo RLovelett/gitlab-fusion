@@ -10,6 +10,7 @@ import Environment
 import Foundation
 import os.log
 import Path
+import VMwareFusion
 
 private let log = OSLog(subsystem: subsystem, category: "cleanup")
 
@@ -44,7 +45,7 @@ struct Cleanup: ParsableCommand {
         os_log("Cleanup stage is starting.", log: log, type: .info)
 
         os_log("The base VMware Fusion guest is %{public}@", log: log, type: .info, baseVMPath.string)
-        let base = VirtualMachine(image: baseVMPath, executable: options.vmrunPath)
+        let base = VirtualMachine(image: baseVMPath, executable: options.vmwareFusion)
 
         /// The name of VMware Fusion guest created by the clone operation
         let clonedGuestName = "\(base.name)-runner-\(ciRunnerId)-concurrent-\(ciConcurrentProjectId)"
@@ -55,7 +56,7 @@ struct Cleanup: ParsableCommand {
             .join("\(clonedGuestName).vmx")
 
         os_log("The cloned VMware Fusion guest is %{public}@", log: log, type: .info, clonedGuestPath.string)
-        let clone = VirtualMachine(image: clonedGuestPath, executable: options.vmrunPath)
+        let clone = VirtualMachine(image: clonedGuestPath, executable: options.vmwareFusion)
 
         try clone.stop()
     }

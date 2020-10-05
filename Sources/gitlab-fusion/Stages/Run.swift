@@ -11,6 +11,7 @@ import Foundation
 import os.log
 import Path
 import SecureShell
+import VMwareFusion
 
 private let log = OSLog(subsystem: subsystem, category: "run")
 
@@ -64,7 +65,7 @@ struct Run: ParsableCommand {
         os_log("Run stage %{public}@ is starting.", log: log, type: .info, subStage)
 
         os_log("The base VMware Fusion guest is %{public}@", log: log, type: .info, baseVMPath.string)
-        let base = VirtualMachine(image: baseVMPath, executable: options.vmrunPath)
+        let base = VirtualMachine(image: baseVMPath, executable: options.vmwareFusion)
 
         /// The name of VMware Fusion guest created by the clone operation
         let clonedGuestName = "\(base.name)-runner-\(ciRunnerId)-concurrent-\(ciConcurrentProjectId)"
@@ -75,7 +76,7 @@ struct Run: ParsableCommand {
             .join("\(clonedGuestName).vmx")
 
         os_log("The cloned VMware Fusion guest is %{public}@", log: log, type: .info, clonedGuestPath.string)
-        let clone = VirtualMachine(image: clonedGuestPath, executable: options.vmrunPath)
+        let clone = VirtualMachine(image: clonedGuestPath, executable: options.vmwareFusion)
 
         guard let ip = clone.ip else {
             throw GitlabRunnerError.systemFailure
