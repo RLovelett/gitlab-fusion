@@ -28,8 +28,5 @@ let package = Package(
                 .product(name: "Shout", package: "Shout"),
             ]
         ),
-        .testTarget(
-            name: "gitlab-fusionTests",
-            dependencies: ["gitlab-fusion"]),
     ]
 )
