@@ -79,18 +79,26 @@ struct Prepare: ParsableCommand {
         os_log("The base VMware Fusion guest is %{public}@", log: log, type: .debug, baseVMPath.string)
         let base = VirtualMachine(image: baseVMPath, executable: options.vmwareFusion)
 
-        /// The name of VMware Fusion guest created by the clone operation
-        let clonedGuestName = "\(base.name)-runner-\(ciRunnerId)-concurrent-\(ciConcurrentProjectId)"
+        // Check if the snapshot exists (creating it if necessary)
+        let rootSnapshotname = subsystem
+        if !base.snapshots.contains(rootSnapshotname) {
+            FileHandle.standardOutput
+                .write(line: "Creating snapshot \"\(rootSnapshotname)\" in base guest \"\(base.name)\"...")
+            try base.snapshot(rootSnapshotname)
+        }
 
         // Check if the snapshot exists (creating it if necessary)
-        let baseVMSnapshotName = "base-snapshot-\(clonedGuestName)"
-        if !base.snapshots.contains(baseVMSnapshotName) {
+        let cloneBaseSnapshotname = "\(ciServerHost)-runner-\(ciRunnerId)-concurrent-\(ciConcurrentProjectId)"
+        if !base.snapshots.contains(cloneBaseSnapshotname) {
             FileHandle.standardOutput
-                .write(line: "Creating snapshot \"\(baseVMSnapshotName)\" in base guest \"\(base.name)\"...")
-            try base.snapshot(baseVMSnapshotName)
+                .write(line: "Creating snapshot \"\(cloneBaseSnapshotname)\" in base guest \"\(base.name)\"...")
+            // Ensure that the common base snapshot is used
+            try base.revert(to: rootSnapshotname)
+            try base.snapshot(cloneBaseSnapshotname)
         }
 
         /// The path of the VMware Fusion guest created by the clone operation
+        let clonedGuestName = "\(base.name)-\(ciServerHost)-runner-\(ciRunnerId)-concurrent-\(ciConcurrentProjectId)"
         let clonedGuestPath = options.vmImagesPath
             .join("\(clonedGuestName).vmwarevm")
             .join("\(clonedGuestName).vmx")
@@ -99,8 +107,8 @@ struct Prepare: ParsableCommand {
         let clone: VirtualMachine
         if !clonedGuestPath.exists {
             FileHandle.standardOutput
-                .write(line: "Cloning from snapshot \"\(baseVMSnapshotName)\" in base guest \"\(base.name)\" to \"\(clonedGuestName)\"...")
-            clone = try base.clone(to: clonedGuestPath, named: clonedGuestName, linkedTo: baseVMSnapshotName)
+                .write(line: "Cloning from snapshot \"\(cloneBaseSnapshotname)\" in base guest \"\(base.name)\" to \"\(clonedGuestName)\"...")
+            clone = try base.clone(to: clonedGuestPath, named: clonedGuestName, linkedTo: cloneBaseSnapshotname)
         } else {
             clone = VirtualMachine(image: clonedGuestPath, executable: options.vmwareFusion)
         }

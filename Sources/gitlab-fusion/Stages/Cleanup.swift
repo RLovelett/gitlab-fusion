@@ -48,7 +48,7 @@ struct Cleanup: ParsableCommand {
         let base = VirtualMachine(image: baseVMPath, executable: options.vmwareFusion)
 
         /// The name of VMware Fusion guest created by the clone operation
-        let clonedGuestName = "\(base.name)-runner-\(ciRunnerId)-concurrent-\(ciConcurrentProjectId)"
+        let clonedGuestName = "\(base.name)-\(ciServerHost)-runner-\(ciRunnerId)-concurrent-\(ciConcurrentProjectId)"
 
         /// The path of the VMware Fusion guest created by the clone operation
         let clonedGuestPath = options.vmImagesPath
