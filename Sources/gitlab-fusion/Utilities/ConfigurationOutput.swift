@@ -42,7 +42,7 @@ struct ConfigurationOutput: Encodable {
             }()
 
             name = "gitlab-fusion"
-            version = "1.0.0-rc.0 — VMware Fusion \(vmwareFusionVersion)"
+            version = "1.0.0-rc.1 — VMware Fusion \(vmwareFusionVersion)"
         }
     }
 
