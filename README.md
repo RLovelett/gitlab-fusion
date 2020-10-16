@@ -1,5 +1,7 @@
 # gitlab-fusion
 
+![Continuous Integration (CI)](https://github.com/RLovelett/gitlab-fusion/workflows/Continuous%20Integration%20(CI)/badge.svg)
+
 `gitlab-fusion` is a [custom executor](https://docs.gitlab.com/13.4/runner/executors/custom.html)
 for GitLab Runner. This custom executor allows for the creation of a clean build
 environment from a known base state for every job executed by CI.
