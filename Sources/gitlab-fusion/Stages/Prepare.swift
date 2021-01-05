@@ -131,6 +131,17 @@ struct Prepare: ParsableCommand {
         try clone.start(hasGUI: isGUI)
 
         FileHandle.standardOutput.write(line: "Waiting for guest \"\(clonedGuestName)\" to become responsive...")
+        // Wait for ip to become available
+        for _ in 1...60 {
+            if let _ = clone.ip {
+                break
+            }
+
+            sleep(60)
+        }
+
+        // TODO: Actually handle this case better
+        // 'Waited 60x60 seconds for ip to become available, exiting...'
         guard let ip = clone.ip else {
             throw GitlabRunnerError.systemFailure
         }
