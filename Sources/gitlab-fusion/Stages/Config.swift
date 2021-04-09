@@ -72,17 +72,22 @@ struct Config: ParsableCommand {
             driver: driver
         )
 
-        let encoder = JSONEncoder()
-        encoder.keyEncodingStrategy = .convertToSnakeCase
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        let json = try encoder.encode(config)
+        do {
+            let encoder = JSONEncoder()
+            encoder.keyEncodingStrategy = .convertToSnakeCase
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            let json = try encoder.encode(config)
 
-        if let string = String(data: json, encoding: .utf8) {
-            os_log("%{public}@", log: log, type: .info, string)
-        } else {
-            os_log("The encoded data was not a valid UTF-8 string.", log: log, type: .error)
+            if let string = String(data: json, encoding: .utf8) {
+                os_log("%{public}@", log: log, type: .info, string)
+            } else {
+                os_log("The encoded data was not a valid UTF-8 string.", log: log, type: .error)
+            }
+
+            FileHandle.standardOutput.write(json)
+        } catch {
+            os_log("Could not encode JSON data.", log: log, type: .error)
+            throw ExitCode(GitlabRunnerError.systemFailure)
         }
-
-        FileHandle.standardOutput.write(json)
     }
 }
