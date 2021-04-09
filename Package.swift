@@ -11,7 +11,7 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "0.3.0"),
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "0.4.1"),
         .package(url: "https://github.com/mxcl/Path.swift.git", from: "1.0.0"),
         .package(name: "Environment", url: "https://github.com/wlisac/environment.git", from: "0.11.1"),
     ],
