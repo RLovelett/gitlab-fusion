@@ -76,7 +76,8 @@ struct Run: ParsableCommand {
         let clone = VirtualMachine(image: clonedGuestPath, executable: options.vmwareFusion)
 
         guard let ip = clone.ip else {
-            throw GitlabRunnerError.systemFailure
+            os_log("VMware Guest never resolved an IP address.", log: log, type: .error)
+            throw ExitCode(GitlabRunnerError.systemFailure)
         }
 
         let script = try String(contentsOf: scriptFile)
@@ -91,7 +92,7 @@ struct Run: ParsableCommand {
             os_log("Run stage %{public}@ returned %{public}d.", log: log, type: .info, subStage, exitCode)
         } else {
             os_log("Run stage %{public}@ returned %{public}d.", log: log, type: .error, subStage, exitCode)
-            throw GitlabRunnerError.buildFailure
+            throw ExitCode(GitlabRunnerError.buildFailure)
         }
     }
 }

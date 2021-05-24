@@ -58,6 +58,11 @@ struct Cleanup: ParsableCommand {
         os_log("The cloned VMware Fusion guest is %{public}@", log: log, type: .info, clonedGuestPath.string)
         let clone = VirtualMachine(image: clonedGuestPath, executable: options.vmwareFusion)
 
-        try clone.stop()
+        do {
+            try clone.stop()
+        } catch {
+            os_log("Could not stop the VMware Fusion guest.", log: log, type: .error)
+            throw ExitCode(GitlabRunnerError.systemFailure)
+        }
     }
 }

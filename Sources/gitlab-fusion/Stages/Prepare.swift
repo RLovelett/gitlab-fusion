@@ -132,7 +132,8 @@ struct Prepare: ParsableCommand {
 
         FileHandle.standardOutput.write(line: "Waiting for guest \"\(clonedGuestName)\" to become responsive...")
         guard let ip = clone.ip else {
-            throw GitlabRunnerError.systemFailure
+            os_log("VMware Guest never resolved an IP address.", log: log, type: .error)
+            throw ExitCode(GitlabRunnerError.systemFailure)
         }
 
         // Wait for ssh to become available
@@ -152,6 +153,7 @@ struct Prepare: ParsableCommand {
 
         // TODO: Actually handle this case better
         // 'Waited 60 seconds for sshd to start, exiting...'
-        throw GitlabRunnerError.systemFailure
+        os_log("VMware Guest never responded to SSH requests.", log: log, type: .error)
+        throw ExitCode(GitlabRunnerError.systemFailure)
     }
 }
