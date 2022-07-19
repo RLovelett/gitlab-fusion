@@ -95,7 +95,7 @@ public struct VMwareFusion {
 ///
 /// For the most part this type enables `VMWareFusion` to be testable on a
 /// machine without VMware Fusion being installed in it.
-protocol Executable: class {
+protocol Executable: AnyObject {
     init()
     var executableURL: URL? { get set }
     var arguments: [String]? { get set }
