@@ -41,7 +41,6 @@ public struct VirtualMachine {
 
     /// Lists all snapshots in a virtual machine.
     public var snapshots: [String] {
-        os_log("vmrun -T fusion listSnapshots %{public}@", log: log, type: .debug, path.string)
         let result = fusion.vmrun("-T", "fusion", "listSnapshots", path.string)
         switch result {
         case .success(let stdout):
@@ -57,11 +56,10 @@ public struct VirtualMachine {
     /// - Parameter name: Snapshot name
     /// - Throws: If the `vmrun` command fails.
     public func snapshot(_ name: String) throws {
-        os_log("vmrun -T fusion snapshot %{public}@ %{public}@", log: log, type: .debug, path.string, name)
         let result = fusion.vmrun("-T", "fusion", "snapshot", path.string, name)
         switch result {
-        case .success(let stdout):
-            os_log("stdout: %{public}@", log: log, type: .debug, stdout)
+        case .success:
+            return
         case .failure(let error):
             throw error
         }
@@ -76,15 +74,14 @@ public struct VirtualMachine {
     /// - Throws: If the `vmrun` command fails.
     /// - Returns: A new `VirtualMachine` initialized the new clone machine.
     public func clone(to destination: Path, named cloneName: String, linkedTo snapshot: String) throws -> VirtualMachine {
-        os_log("vmrun -T fusion clone %{public}@ %{public}@ linked -snapshot=%{public}@ -cloneName=%{public}@", log: log, type: .debug, path.string, destination.string, snapshot, cloneName)
         let result = fusion.vmrun("-T", "fusion", "clone", path.string, destination.string, "linked", "-snapshot=\(snapshot)", "-cloneName=\(cloneName)")
         switch result {
-        case .success(let stdout):
-            os_log("stdout: %{public}@", log: log, type: .debug, stdout)
+        case .success:
+            return VirtualMachine(destination, fusion)
         case .failure(let error):
             throw error
         }
-        return VirtualMachine(destination, fusion)
+
     }
 
     /// Sets the virtual machine to its state at snapshot time.
@@ -92,11 +89,10 @@ public struct VirtualMachine {
     /// - Parameter snapshot: The name of the snapshot to revert to.
     /// - Throws: If the `vmrun` command fails.
     public func revert(to snapshot: String) throws {
-        os_log("vmrun -T fusion revertToSnapshot %{public}@ %{public}@", log: log, type: .debug, path.string, snapshot)
         let result = fusion.vmrun("-T", "fusion", "revertToSnapshot", path.string, snapshot)
         switch result {
-        case .success(let stdout):
-            os_log("stdout: %{public}@", log: log, type: .debug, stdout)
+        case .success:
+            return
         case .failure(let error):
             throw error
         }
@@ -112,11 +108,10 @@ public struct VirtualMachine {
     /// not.
     /// - Throws: If the `vmrun` command fails.
     public func start(hasGUI: Bool) throws {
-        os_log("vmrun -T fusion start %{public}@ %{public}@", log: log, type: .debug, path.string, hasGUI ? "gui" : "nogui")
         let result = fusion.vmrun("-T", "fusion", "start", path.string, hasGUI ? "gui" : "nogui")
         switch result {
-        case .success(let stdout):
-            os_log("stdout: %{public}@", log: log, type: .debug, stdout)
+        case .success:
+            return
         case .failure(let error):
             throw error
         }
@@ -126,11 +121,10 @@ public struct VirtualMachine {
     ///
     /// - Throws: If the `vmrun` command fails.
     public func stop() throws {
-        os_log("vmrun -T fusion stop %{public}@ hard", log: log, type: .debug, path.string)
         let result = fusion.vmrun("-T", "fusion", "stop", path.string, "hard")
         switch result {
-        case .success(let stdout):
-            os_log("stdout: %{public}@", log: log, type: .debug, stdout)
+        case .success:
+            return
         case .failure(let error):
             throw error
         }
@@ -141,12 +135,14 @@ public struct VirtualMachine {
     /// The IP address is not available until the virtual machine powers on and
     /// requires the guest additions to be running.
     public var ip: String? {
-        os_log("vmrun -T fusion getGuestIPAddress %{public}@ -wait", log: log, type: .debug, path.string)
         let result = fusion.vmrun("-T", "fusion", "getGuestIPAddress", path.string, "-wait")
         switch result {
         case .success(let ip) where validate(ipAddress: ip.trimmingCharacters(in: .whitespacesAndNewlines)):
             return ip.trimmingCharacters(in: .whitespacesAndNewlines)
-        default:
+        case .success(let stdout):
+            log.error("VMware did not provide a parseable IP address. \(stdout, privacy: .public)")
+            return nil
+        case .failure:
             return nil
         }
     }

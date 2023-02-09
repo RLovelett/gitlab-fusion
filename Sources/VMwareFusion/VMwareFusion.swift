@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import os.log
 import Path
 
 /// A type that manages interactions with VMware Fusion. Specifically it
@@ -61,9 +60,11 @@ public struct VMwareFusion {
         task.standardError = stderr
 
         do {
+            log.debug("\(executable.url, privacy: .public) \(arguments.joined(separator: " "), privacy: .public)")
             try task.run()
         } catch {
-            os_log("%{public}@", log: log, type: .error, error as CVarArg)
+            log.error("The supplied vmrun, \(executable, privacy: .public), cannot be executed.")
+            log.error("Swift Error: \(String(describing: error), privacy: .public)")
             // This gets triggered if the executableURL does not exist or is not executable
             let message = "The supplied vmrun, \"\(executable)\", cannot be executed."
             let fusionError = Error(exitCode: 2, stdout: error.localizedDescription, stderr: message)
@@ -79,8 +80,14 @@ public struct VMwareFusion {
 
         switch task.terminationReason {
         case .exit where exitCode == ERR_SUCCESS:
+            log.debug("stdout: \(out, privacy: .public)")
+            log.debug("stderr: \(err, privacy: .public)")
+            log.debug("Success")
             return .success(out)
         case .uncaughtSignal, .exit:
+            log.error("stdout: \(out, privacy: .public)")
+            log.error("stderr: \(err, privacy: .public)")
+            log.error("Error")
             return .failure(Error(exitCode: exitCode, stdout: out, stderr: err))
         default:
             fatalError("An unknown case for `Process.TerminationReason` has been encountered. This is possible but unexpected.")

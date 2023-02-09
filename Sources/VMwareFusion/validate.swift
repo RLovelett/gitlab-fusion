@@ -6,9 +6,9 @@
 //
 
 import Darwin
-import os.log
+import os
 
-let log = OSLog(subsystem: "me.lovelett.gitlab-fusion", category: "VMWareFusion")
+let log = Logger(subsystem: "me.lovelett.gitlab-fusion", category: "VMWareFusion")
 
 /// Check to see if a `String` is a valid IP address.
 ///
